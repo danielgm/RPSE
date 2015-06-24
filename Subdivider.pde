@@ -9,14 +9,16 @@ class Subdivider {
         abstract PVector[][] division(PVector[] v); 
       
         //Subdivide all queue elements
-        void division(LinkedList<PVector[]> pols) 
+        void division(LinkedList<Polygon> pols) 
         {
+            Polygon pol;
             PVector[][] nu;
             int S = pols.size();
             for (int i = 0; i < S; i++) {
-                nu = division(pols.poll());
+                pol = pols.poll();
+                nu = division(pol.vertices());
                 int L = nu.length;
-                for (int j = 0; j < L; j++) pols.offer(nu[j]);          
+                for (int j = 0; j < L; j++) pols.offer(new Polygon(pol.generation() + 1, nu[j]));          
             }
         }
     } 
@@ -32,7 +34,7 @@ class Subdivider {
         PVector[][] division(PVector[] v) { 
             int L = v.length; 
             PVector[][] nu = new PVector[L][];
-            PVector c = Polygon.center(v);
+            PVector c = center(v);
             for (int i = 0, j = 1; i < L; i++, j = (j+1)%L)  
                 nu[i] = new PVector[] {new PVector(v[i].x, v[i].y), new PVector(v[j].x, v[j].y), new PVector(c.x, c.y)};
             return nu; 
@@ -64,7 +66,7 @@ class Subdivider {
         PVector[][] division(PVector[] v) {    
             int l = v.length; 
             PVector[][] nu = new PVector[l*2][];
-            PVector c = Polygon.center(v);
+            PVector c = center(v);
             float mx, my;
             for (int i = 0, j = 1, I = 0; i < l; i++, j = (j+1) % l, I = i*2)
             {
@@ -128,4 +130,18 @@ class Subdivider {
             return nu;
         }
     };
+ 
+    //Returns the center of a regular polygon. Careful: it doesn't check whether the input is a well-formed regular polygon.
+    PVector center(PVector[] v) 
+    {
+        int l = v.length, 
+            m = l/2;
+
+        if (l%2 != 0) return LineIntersector.simpleIntersect(v[0].x, v[0].y, (v[m].x + v[m+1].x)*.5, (v[m].y + v[m+1].y)*.5,
+                                                             v[1].x, v[1].y, (v[m+1].x + v[(m+2)%l].x)*.5, (v[m+1].y + v[(m+2)%l].y)*.5);     
+                      return LineIntersector.simpleIntersect(v[0].x, v[0].y, v[m].x, v[m].y,
+                                                             v[1].x, v[1].y, v[(m+1)%l].x, v[(m+1)%l].y);
+    } 
+    
+    public Divider[] dividers = new Divider[] {SPARSE_BARYCENTRIC, MIRRORED, DENSE_BARYCENTRIC, STARRED, SUTCLIFFE};
 }
