@@ -31,12 +31,17 @@ FastBlurrer blurrer;
 
 color[] palette;
 
+FileNamer fileNamer;
+
 void setup ()
 {
     size(w, h);
     background(bg);
     smooth();
     _ = new Subdivider(); 
+    
+    fileNamer = new FileNamer("output/export", "png");
+    
     reset();
 }
 
@@ -115,7 +120,7 @@ void keyPressed()
             redraw();
             break;
         case ('r'):
-            saveFrame();
+            saveFrame(fileNamer.next());
             break;
     }    
           
