@@ -22,7 +22,7 @@ int w = 750,
     sides= floor(random(minSides, maxSides)),
     bg = #0090ff,
     st = 0x50ffffff,
-    jitter = 2;
+    jitter = 8;
 
 LinkedList <Polygon> pols;
 Subdivider _;
@@ -91,7 +91,8 @@ void redraw() {
         graphics.beginShape();
           PVector[] vertices = pol.vertices();
           for (int i = 0; i < vertices.length; i++) {
-            graphics.vertex(vertices[i].x + random(jitter) - jitter/2, vertices[i].y + random(jitter) - jitter/2);
+            float d = dist(vertices[i].x, vertices[i].y, width/2, height/2) / max(width/2, height/2);
+            graphics.vertex(vertices[i].x + d * (random(jitter) - jitter/2), vertices[i].y + d * (random(jitter) - jitter/2));
           }
         graphics.endShape(CLOSE);
     }
@@ -137,7 +138,7 @@ void keyPressed()
     } else if (key == ' ') {
       sides = floor(random(minSides, maxSides));
       reset();
-      while (pols.size() < 10000 && random(1) < 0.98) {
+      while (pols.size() < 5000 && random(1) < 0.98) {
         step();
       }
     }
