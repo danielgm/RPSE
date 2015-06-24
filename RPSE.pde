@@ -30,6 +30,7 @@ PGraphics graphics;
 FastBlurrer blurrer;
 
 color[] palette;
+int paletteOffset;
 
 FileNamer fileNamer;
 
@@ -57,6 +58,8 @@ void reset()
     
     palette = loadPalette("data/planetary.png");
     
+    paletteOffset = floor(random(palette.length));
+    
     background(bg);
     redraw();
 }
@@ -82,7 +85,7 @@ void redraw() {
     graphics.beginDraw();
     for (Polygon pol : pols) {
         graphics.noFill();
-        color c = palette[pol.generation() % palette.length];
+        color c = palette[(pol.generation() + paletteOffset) % palette.length];
         graphics.stroke(c);
         graphics.strokeWeight(constrain(map(pol.generation(), 5, 0, 0.1, 3), 0, 12));
         graphics.beginShape();
@@ -134,7 +137,7 @@ void keyPressed()
     } else if (key == ' ') {
       sides = floor(random(minSides, maxSides));
       reset();
-      while (pols.size() < 500 && random(1) < 0.95) {
+      while (pols.size() < 10000 && random(1) < 0.98) {
         step();
       }
     }
